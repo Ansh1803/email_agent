@@ -492,22 +492,22 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import os
 
-@csrf_exempt
-def setup_app_user(request):
-    if request.GET.get("key") != os.getenv("SETUP_SECRET"):
-        return HttpResponse("Forbidden", status=403)
+# @csrf_exempt
+# def setup_app_user(request):
+#     if request.GET.get("key") != os.getenv("SETUP_SECRET"):
+#         return HttpResponse("Forbidden", status=403)
 
-    User = get_user_model()
+#     User = get_user_model()
 
-    user, created = User.objects.get_or_create(
-        username="ansh",
-        defaults={
-            "is_staff": True,
-            "is_superuser": True,
-            "is_active": True,
-        }
-    )
+#     user, created = User.objects.get_or_create(
+#         username="ansh",
+#         defaults={
+#             "is_staff": True,
+#             "is_superuser": True,
+#             "is_active": True,
+#         }
+#     )
 
-    return HttpResponse(
-        "User created" if created else "User already exists"
-    )
+#     return HttpResponse(
+#         "User created" if created else "User already exists"
+#     )
