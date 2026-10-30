@@ -1,0 +1,89 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailMind AI Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="dashboard">
+
+        <aside class="sidebar">
+            <h2>MailMind<span>AI</span></h2>
+
+            <nav>
+                <a href="/dashboard/" class="active">Dashboard</a>
+                <a href="#">Inbox</a>
+                <a href="#">AI Drafts</a>
+                <a href="#">Connected Accounts</a>
+                <a href="#">Settings</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <p>Logged in as {{ request.user.username }}</p>
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Welcome to your AI email assistant.</p>
+                </div>
+
+                <div class="status">
+                    <span class="status-dot"></span>
+                    System Ready
+                </div>
+            </header>
+
+            <section class="stats">
+                <div class="stat-card">
+                    <p>Total Emails</p>
+                    <h2>0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Summarized</p>
+                    <h2>0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Pending Drafts</p>
+                    <h2>0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Replies Sent</p>
+                    <h2>0</h2>
+                </div>
+            </section>
+
+            <section class="email-section">
+                <div class="section-header">
+                    <h2>Recent Emails</h2>
+                    <button class="connect-btn" disabled>
+                        Gmail Integration Coming Soon
+                    </button>
+                </div>
+
+                <div class="empty-state">
+                    <h3>No emails yet</h3>
+                    <p>
+                        Connect your Gmail account to start receiving
+                        AI-powered email summaries.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

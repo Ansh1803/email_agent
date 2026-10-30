@@ -1,0 +1,20 @@
+# Environment secrets
+.env
+.env.*
+
+# Google OAuth credentials
+credentials/
+token.json
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+
+# Django
+db.sqlite3
+staticfiles/
+
+# IDE
+.vscode/
+.idea/

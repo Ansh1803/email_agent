@@ -1,0 +1,46 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailMind AI - Login</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo">
+                <h1>MailMind<span>AI</span></h1>
+                <p>Your intelligent email assistant</p>
+            </div>
+
+            <h2>Welcome back</h2>
+            <p class="subtitle">Sign in to manage your emails with AI.</p>
+
+            {% if form.errors %}
+                <p class="error">Invalid username or password.</p>
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                <label>Username</label>
+                <input type="text" name="username"
+                       placeholder="Enter username" required>
+
+                <label>Password</label>
+                <input type="password" name="password"
+                       placeholder="Enter password" required>
+
+                <input type="hidden" name="next" value="/dashboard/">
+
+                <button type="submit">Sign In</button>
+            </form>
+
+            <p class="footer-text">AI-powered email management.</p>
+        </div>
+    </div>
+</body>
+</html>
