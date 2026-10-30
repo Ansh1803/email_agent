@@ -8,82 +8,334 @@
     <title>MailMind AI Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
-    <div class="dashboard">
+<div class="dashboard">
 
-        <aside class="sidebar">
-            <h2>MailMind<span>AI</span></h2>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2>MailMind<span>AI</span></h2>
 
-            <nav>
-                <a href="/dashboard/" class="active">Dashboard</a>
-                <a href="#">Inbox</a>
-                <a href="#">AI Drafts</a>
-                <a href="#">Connected Accounts</a>
-                <a href="#">Settings</a>
-            </nav>
+        <nav>
+            <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
+            <a href="#inbox">Inbox</a>
+            <a href="#inbox">AI Drafts</a>
+            <a href="#accounts">Connected Accounts</a>
+            <a href="#">Settings</a>
+        </nav>
 
-            <div class="sidebar-bottom">
-                <p>Logged in as {{ request.user.username }}</p>
+        <div class="sidebar-bottom">
+            <p>Logged in as {{ request.user.username }}</p>
 
-                <form method="POST" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header>
+            <div>
+                <h1>Dashboard</h1>
+                <p>Welcome to your AI email assistant.</p>
             </div>
-        </aside>
 
-        <main class="main-content">
-            <header>
-                <div>
-                    <h1>Dashboard</h1>
-                    <p>Welcome to your AI email assistant.</p>
-                </div>
+            <div class="status">
+                <span class="status-dot"></span>
+                System Ready
+            </div>
+        </header>
 
-                <div class="status">
-                    <span class="status-dot"></span>
-                    System Ready
-                </div>
-            </header>
+        <!-- STATISTICS -->
+        <section class="stats">
 
-            <section class="stats">
-                <div class="stat-card">
-                    <p>Total Emails</p>
-                    <h2>0</h2>
-                </div>
+            <div class="stat-card">
+                <p>Total Emails</p>
+                <h2>{{ emails|length }}</h2>
+            </div>
 
-                <div class="stat-card">
-                    <p>Summarized</p>
-                    <h2>0</h2>
-                </div>
+            <div class="stat-card">
+                <p>Summarized</p>
+                <h2>
+                    {% with count=0 %}
+                        {{ emails|length }}
+                    {% endwith %}
+                </h2>
+            </div>
 
-                <div class="stat-card">
-                    <p>Pending Drafts</p>
-                    <h2>0</h2>
-                </div>
+            <div class="stat-card">
+                <p>Pending Drafts</p>
+                <h2>View Inbox</h2>
+            </div>
 
-                <div class="stat-card">
-                    <p>Replies Sent</p>
-                    <h2>0</h2>
-                </div>
-            </section>
+            <div class="stat-card">
+                <p>Replies Sent</p>
+                <h2>View Inbox</h2>
+            </div>
 
-            <section class="email-section">
-                <div class="section-header">
-                    <h2>Recent Emails</h2>
-                    <button class="connect-btn" disabled>
-                        Gmail Integration Coming Soon
-                    </button>
-                </div>
+        </section>
 
-                <div class="empty-state">
-                    <h3>No emails yet</h3>
-                    <p>
-                        Connect your Gmail account to start receiving
-                        AI-powered email summaries.
+        <!-- DJANGO MESSAGES -->
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">
+                        {{ message }}
                     </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- INBOX -->
+        <section class="inbox-container" id="inbox">
+
+            <div class="inbox-header">
+                <div>
+                    <h2>Your Inbox</h2>
+                    <p>Click an email to open and manage it.</p>
                 </div>
-            </section>
-        </main>
-    </div>
+
+                <span>{{ emails|length }} emails</span>
+            </div>
+
+            <div class="email-list">
+
+                {% for email in emails %}
+
+                    <details class="email-item">
+
+                        <!-- COMPACT EMAIL ROW -->
+                        <summary class="email-row">
+
+                            <div class="email-sender">
+                                {{ email.sender_name|default:email.sender_email }}
+                            </div>
+
+                            <div class="email-info">
+                                <strong>
+                                    {{ email.subject|default:"(No subject)" }}
+                                </strong>
+
+                                <span>
+                                    {{ email.snippet|default:email.body|truncatechars:100 }}
+                                </span>
+                            </div>
+
+                            <div class="email-date">
+                                {{ email.received_at|date:"d M" }}
+                            </div>
+
+                            <div class="expand-icon">⌄</div>
+
+                        </summary>
+
+                        <!-- EXPANDED EMAIL -->
+                        <div class="email-expanded">
+
+                            <div class="email-details">
+                                <p>
+                                    <strong>From:</strong>
+                                    {{ email.sender_email }}
+                                </p>
+
+                                <p>
+                                    <strong>Subject:</strong>
+                                    {{ email.subject|default:"(No subject)" }}
+                                </p>
+
+                                <p>
+                                    <strong>Date:</strong>
+                                    {{ email.received_at|date:"d M Y, h:i A" }}
+                                </p>
+                            </div>
+
+                            <!-- ORIGINAL EMAIL -->
+                            <div class="original-email">
+                                <h3>Original Email</h3>
+
+                                <div class="email-body">
+                                    {{ email.body|linebreaksbr }}
+                                </div>
+                            </div>
+
+                            <!-- AI ACTION BUTTONS -->
+                            <div class="ai-actions">
+
+                                <form method="POST"
+                                      action="{% url 'summarize_email' email.id %}">
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="ai-btn summary-btn">
+                                        ✨ Generate AI Summary
+                                    </button>
+                                </form>
+
+                                <form method="POST"
+                                      action="{% url 'generate_reply' email.id %}">
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="ai-btn reply-btn">
+                                        ↩ Generate AI Reply
+                                    </button>
+                                </form>
+
+                            </div>
+
+                            <!-- AI SUMMARY -->
+                            {% if email.ai_summary and email.ai_summary.summary %}
+
+                                <div class="summary-panel">
+                                    <h3>✨ AI Summary</h3>
+
+                                    <p>
+                                        {{ email.ai_summary.summary|linebreaksbr }}
+                                    </p>
+                                </div>
+
+                            {% endif %}
+
+                            <!-- AI REPLY DRAFTS -->
+                            <div class="reply-section">
+
+                                <h3>AI Generated Replies</h3>
+
+                                {% for draft in email.reply_drafts.all %}
+
+                                    <div class="reply-panel">
+
+                                        <div class="reply-heading">
+                                            <h4>Reply Draft</h4>
+
+                                            {% if draft.status == "SENT" %}
+                                                <span class="status-sent">Sent</span>
+                                            {% else %}
+                                                <span class="status-draft">Draft</span>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if draft.status == "DRAFT" %}
+
+                                            <!-- EDIT REPLY -->
+                                            <form method="POST"
+                                                  action="{% url 'update_reply' draft.id %}">
+
+                                                {% csrf_token %}
+
+                                                <textarea
+                                                    name="reply_body"
+                                                    class="reply-editor"
+                                                    rows="9"
+                                                    required>{{ draft.reply_body }}</textarea>
+
+                                                <button type="submit" class="save-btn">
+                                                    Save Changes
+                                                </button>
+
+                                            </form>
+
+                                            <!-- SEND REPLY -->
+                                            <form method="POST"
+                                                  action="{% url 'send_reply' draft.id %}"
+                                                  onsubmit="return confirm('Send this reply to {{ email.sender_email|escapejs }}?');">
+
+                                                {% csrf_token %}
+
+                                                <button type="submit" class="send-btn">
+                                                    Send Reply
+                                                </button>
+
+                                            </form>
+
+                                        {% elif draft.status == "SENT" %}
+
+                                            <div class="sent-reply">
+                                                {{ draft.reply_body|linebreaksbr }}
+                                            </div>
+
+                                            <p class="sent-time">
+                                                Sent on:
+                                                {{ draft.sent_at|date:"d M Y, h:i A" }}
+                                            </p>
+
+                                        {% else %}
+
+                                            <div class="sent-reply">
+                                                {{ draft.reply_body|linebreaksbr }}
+                                            </div>
+
+                                            <p>Status: {{ draft.get_status_display }}</p>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                {% empty %}
+
+                                    <p class="no-reply">
+                                        No reply generated yet.
+                                    </p>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    </details>
+
+                {% empty %}
+
+                    <p class="empty-inbox">
+                        Your inbox is empty. Connect Gmail and sync your emails.
+                    </p>
+
+                {% endfor %}
+
+            </div>
+        </section>
+
+        <!-- GMAIL INTEGRATION -->
+        <section class="gmail-section" id="accounts">
+
+            <h2>Gmail Integration</h2>
+
+            <p>
+                Connect your Gmail account to manage your email workflow.
+            </p>
+
+            <a href="{% url 'gmail_connect' %}" class="connect-btn">
+                + Connect Gmail
+            </a>
+
+            <form method="POST" action="{% url 'sync_inbox' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="connect-btn">
+                    Sync Inbox
+                </button>
+            </form>
+
+            <h3>Connected Accounts</h3>
+
+            {% for account in accounts %}
+
+                <div class="account-card">
+                    <span>{{ account.email_address }}</span>
+                    <span class="status-connected">Connected</span>
+                </div>
+
+            {% empty %}
+
+                <p>No Gmail account connected yet.</p>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+</div>
 </body>
 </html>
