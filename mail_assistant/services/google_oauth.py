@@ -54,17 +54,18 @@ def decrypt_credentials(encrypted_data):
 def get_client_secrets_path():
     path = os.getenv("GOOGLE_CLIENT_SECRETS_FILE")
 
+    print("DEBUG OAuth path:", repr(path))
+    print("DEBUG OAuth file exists:", os.path.isfile(path) if path else False)
+
     if not path:
-        raise ValueError(
-            "GOOGLE_CLIENT_SECRETS_FILE is not configured."
-        )
+        raise ValueError("GOOGLE_CLIENT_SECRETS_FILE is not configured.")
 
     if not os.path.isfile(path):
         raise FileNotFoundError(
             f"Google OAuth credentials file not found: {path}"
         )
 
-    return path
+    return path    
 
 
 
