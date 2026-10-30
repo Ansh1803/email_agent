@@ -16,7 +16,6 @@ from email.mime.text import MIMEText
 
 import os
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.send",
@@ -51,18 +50,21 @@ def decrypt_credentials(encrypted_data):
     return json.loads(decrypted.decode())
 
 
-def get_client_secrets_path():
-    path = Path(settings.BASE_DIR) / os.getenv(
-        "GOOGLE_CLIENT_SECRETS_FILE",
-        "credentials/google-oauth-client.json"
-    )
 
-    if not path.is_file():
+def get_client_secrets_path():
+    path = os.getenv("GOOGLE_CLIENT_SECRETS_FILE")
+
+    if not path:
+        raise ValueError(
+            "GOOGLE_CLIENT_SECRETS_FILE is not configured."
+        )
+
+    if not os.path.isfile(path):
         raise FileNotFoundError(
             f"Google OAuth credentials file not found: {path}"
         )
 
-    return str(path)
+    return path
 
 
 
