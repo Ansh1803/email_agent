@@ -74,9 +74,10 @@ def create_oauth_flow(state=None):
         autogenerate_code_verifier=True,
     )
 
-    flow.redirect_uri = (
-        "http://127.0.0.1:8000/gmail/oauth/callback/"
-    )
+    flow.redirect_uri = os.getenv(
+    "GOOGLE_REDIRECT_URI",
+    "http://127.0.0.1:8000/gmail/oauth/callback/"
+)
 
     return flow
 

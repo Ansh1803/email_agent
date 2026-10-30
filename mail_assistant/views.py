@@ -23,26 +23,23 @@ from django.utils import timezone
 # --------------------------------------------------
 
 def home(request):
-    return render(request, "mail_assistant/login.html")
+    return render(request, "mail_assistant/dashboard.html")
 
 
 # --------------------------------------------------
 # DASHBOARD
 # --------------------------------------------------
 
-@login_required
 def dashboard(request):
     accounts = GmailAccount.objects.filter(
-        user=request.user,
         is_connected=True
     )
 
-    emails = EmailMessage.objects.filter(
-        account__user=request.user
-    ).select_related("account").order_by(
-        "-received_at",
-        "-created_at"
-    )[:50]
+    emails = EmailMessage.objects.all().select_related(
+    "account", "ai_summary"
+).prefetch_related(
+    "reply_drafts"
+).order_by("-received_at", "-created_at")[:50]
 
     return render(
         request,
@@ -58,7 +55,7 @@ def dashboard(request):
 # CONNECT GMAIL
 # --------------------------------------------------
 
-@login_required
+
 def gmail_connect(request):
     try:
         flow = create_oauth_flow()
@@ -89,7 +86,7 @@ def gmail_connect(request):
 # GMAIL OAUTH CALLBACK
 # --------------------------------------------------
 
-@login_required
+
 def gmail_oauth_callback(request):
     saved_state = request.session.get("gmail_oauth_state")
     received_state = request.GET.get("state")
@@ -173,7 +170,6 @@ def gmail_oauth_callback(request):
 # SYNC INBOX
 # --------------------------------------------------
 
-@login_required
 @require_POST
 def sync_inbox(request):
     accounts = GmailAccount.objects.filter(
@@ -234,7 +230,6 @@ def sync_inbox(request):
 
     return redirect("dashboard")
 
-@login_required
 @require_POST
 def summarize_email_view(request, email_id):
     try:
@@ -279,7 +274,6 @@ def summarize_email_view(request, email_id):
     return redirect("dashboard")
 
 
-@login_required
 @require_POST
 def generate_reply_view(request, email_id):
     try:
@@ -315,7 +309,6 @@ def generate_reply_view(request, email_id):
 
     return redirect("dashboard")
 
-@login_required
 @require_POST
 def send_reply_view(request, draft_id):
     try:
@@ -376,7 +369,6 @@ def send_reply_view(request, draft_id):
 
     return redirect("dashboard")
 
-@login_required
 @require_POST
 def update_reply_view(request, draft_id):
     try:

@@ -18,10 +18,10 @@
 
         <nav>
             <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
-            <a href="#inbox">Inbox</a>
+            <!-- <a href="#inbox">Inbox</a>
             <a href="#inbox">AI Drafts</a>
             <a href="#accounts">Connected Accounts</a>
-            <a href="#">Settings</a>
+            <a href="#">Settings</a> -->
         </nav>
 
         <div class="sidebar-bottom">
@@ -48,9 +48,16 @@
                 System Ready
             </div>
         </header>
+         <form method="POST" action="{% url 'sync_inbox' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="connect-btn">
+                    Sync Inbox
+                </button>
+            </form>
 
         <!-- STATISTICS -->
-        <section class="stats">
+        <!-- <section class="stats">
 
             <div class="stat-card">
                 <p>Total Emails</p>
@@ -76,7 +83,7 @@
                 <h2>View Inbox</h2>
             </div>
 
-        </section>
+        </section> -->
 
         <!-- DJANGO MESSAGES -->
         {% if messages %}
@@ -310,13 +317,7 @@
                 + Connect Gmail
             </a>
 
-            <form method="POST" action="{% url 'sync_inbox' %}">
-                {% csrf_token %}
-
-                <button type="submit" class="connect-btn">
-                    Sync Inbox
-                </button>
-            </form>
+           
 
             <h3>Connected Accounts</h3>
 
